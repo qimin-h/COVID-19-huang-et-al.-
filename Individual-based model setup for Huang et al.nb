@@ -1,0 +1,2159 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     84443,       2151]
+NotebookOptionsPosition[     79886,       2064]
+NotebookOutlinePosition[     81557,       2104]
+CellTagsIndexPosition[     81454,       2098]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Individual-based model ", "Title",
+ CellChangeTimes->{{3.7906081006338587`*^9, 3.790608111186635*^9}, {
+  3.796321045367015*^9, 3.7963210511683774`*^9}, {3.7968273134982305`*^9, 
+  3.796827329088505*^9}, {3.805192493135771*^9, 
+  3.805192506758616*^9}},ExpressionUUID->"40facf5d-ae8c-48da-9d4e-\
+d395851ba7e2"],
+
+Cell["Huang et al.", "Subtitle",
+ CellChangeTimes->{{3.790608118841165*^9, 3.7906081191623063`*^9}, {
+   3.79525803703373*^9, 3.7952580435457*^9}, 3.796321054921049*^9, {
+   3.8006620862053337`*^9, 3.800662089615152*^9}, {3.8051925144621572`*^9, 
+   3.805192524936357*^9}},ExpressionUUID->"afbb50e3-3efd-48f0-a475-\
+c47419c5383d"],
+
+Cell[CellGroupData[{
+
+Cell["Model setup", "Section",
+ CellChangeTimes->{{3.7963418394917097`*^9, 3.7963418499712553`*^9}, 
+   3.805192554613614*^9, {3.805192862693988*^9, 
+   3.805192867035597*^9}},ExpressionUUID->"27f581af-d03a-4697-9472-\
+406739c12add"],
+
+Cell[TextData[{
+ "Host state: h-->{i,d}; ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"i", "\[Element]", 
+    RowBox[{"{", 
+     RowBox[{"E", ",", 
+      SubscriptBox["I", "1"], ",", 
+      SubscriptBox["I", "2"]}], "}"}]}], TraditionalForm]],ExpressionUUID->
+  "86157063-2243-465b-b9b8-81499559561e"],
+ ", d - day in state i\nBernoulli probability p(d) = ",
+ Cell[BoxData[
+  FormBox["\[Phi]", TraditionalForm]],ExpressionUUID->
+  "bf88affe-c66f-4d34-bae1-576f154f734d"],
+ "(d/L), L - mean duration, sigmoid ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    RowBox[{"\[Phi]", "(", "x", ")"}], "=", 
+    FractionBox[
+     SuperscriptBox["x", "m"], 
+     RowBox[{"1", "+", 
+      SuperscriptBox["x", "m"]}]]}], TraditionalForm]],ExpressionUUID->
+  "d6ae8fcc-c401-4796-a0a2-3d2e8a714969"],
+ "\nRandom transition i->i + \[Delta]i Bernoulli[p(d)]"
+}], "Text",
+ CellChangeTimes->{{3.796341895202766*^9, 3.7963419730278544`*^9}, {
+  3.7963420142589245`*^9, 3.7963420246123676`*^9}, {3.7963420635545654`*^9, 
+  3.7963421675937924`*^9}, {3.7963422054669504`*^9, 3.7963422498416824`*^9}, {
+  3.7963423091526575`*^9, 3.7963423281450186`*^9}, {3.7963423697058167`*^9, 
+  3.7963424018819013`*^9}, {3.796486779190276*^9, 
+  3.7964867874238625`*^9}},ExpressionUUID->"8777a08f-68f6-49f4-bc69-\
+8f587a43703c"],
+
+Cell[CellGroupData[{
+
+Cell["Codes", "Subsection",
+ CellChangeTimes->{{3.7963936448586965`*^9, 
+  3.796393646010577*^9}},ExpressionUUID->"6a2bbb26-d7d5-4987-9211-\
+a0931e1d8870"],
+
+Cell[CellGroupData[{
+
+Cell["Disease progress", "Subsubsection",
+ CellChangeTimes->{{3.7963936520942836`*^9, 3.796393654128828*^9}, {
+   3.796401090048605*^9, 3.796401114547021*^9}, 3.796827412798324*^9, {
+   3.7968275270054035`*^9, 
+   3.7968275309358788`*^9}},ExpressionUUID->"0dbd670d-43bb-4e5c-86d5-\
+b87bbef7e44c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", "Labels", "*)"}], 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Slab", "=", 
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<S\>\"", ",", "\"\<E\>\"", ",", 
+       "\"\<\!\(\*SubscriptBox[\(I\), \(1\)]\)\>\"", ",", 
+       "\"\<\!\(\*SubscriptBox[\(I\), \(2\)]\)\>\"", ",", "\"\<R\>\""}], 
+      "}"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Bernoulli", " ", "probability", " ", "f"}], "-", "n"}], "*)"}], 
+   "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"\[Phi]", "[", 
+      RowBox[{"x_", ",", "m_"}], "]"}], "=", 
+     FractionBox[
+      SuperscriptBox["x", "m"], 
+      RowBox[{"1", "+", 
+       SuperscriptBox["x", "m"]}]]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Disease", " ", 
+       RowBox[{"progress", ":", " ", "S"}]}], "\[Rule]", 
+      RowBox[{
+       RowBox[{"E", " ", "as", " ", "f"}], "-", 
+       RowBox[{
+       "n", " ", "of", " ", "probability", " ", "of", " ", "infection"}]}]}], 
+     " ", "=", "a"}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{"DPS", "[", "a_", "]"}], ":=", 
+    RowBox[{"RandomVariate", "[", 
+     RowBox[{"BernoulliDistribution", "@", "a"}], "]"}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"I", "-", "state"}], " ", "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"DPI", "[", 
+      RowBox[{"(*", 
+       RowBox[{"host", " ", "state"}], "*)"}], 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"i_", ",", "d_"}], "}"}], ",", 
+       RowBox[{"(*", 
+        RowBox[{"progress", " ", 
+         RowBox[{"pattern", ":", " ", "sequence"}]}], "*)"}], 
+       RowBox[{"{", 
+        RowBox[{"L_", ",", "step_"}], "}"}]}], "]"}], ":=", 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"With", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"v", "=", 
+          RowBox[{"RandomVariate", "[", 
+           RowBox[{"BernoulliDistribution", "@", 
+            RowBox[{"\[Phi]", "[", 
+             RowBox[{
+              RowBox[{"d", "/", 
+               RowBox[{"L", "[", 
+                RowBox[{"[", "i", "]"}], "]"}]}], ",", 
+              RowBox[{"(*", 
+               RowBox[{"sigmoid", " ", "steepness"}], "*)"}], "8"}], "]"}]}], 
+           "]"}]}], "}"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"v", "\[Equal]", "0"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", 
+            RowBox[{"d", "+", "1"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"i", "+", 
+             RowBox[{"step", "[", 
+              RowBox[{"[", "i", "]"}], "]"}]}], ",", "0"}], "}"}]}], "]"}]}], 
+       "]"}], "/;", 
+      RowBox[{"0", "<", "i", "<", "4"}]}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"R", " ", "state"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"DPI", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"4", ",", "_"}], "}"}], ",", "___"}], "]"}], ":=", "4"}], 
+    ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"DPI", "[", 
+      RowBox[{"4", ",", "___"}], "]"}], ":=", "4"}], ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{"Group", " ", "progress"}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"DPZ", "[", 
+      RowBox[{"(*", 
+       RowBox[{"disease", " ", "group"}], "*)"}], 
+      RowBox[{"mg_", ",", 
+       RowBox[{"(*", 
+        RowBox[{"progress", " ", "pattern"}], "*)"}], "pd_"}], "]"}], ":=", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"DPI", "[", 
+        RowBox[{"#", ",", "pd"}], "]"}], "&"}], "/@", "mg"}]}], ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Random", " ", "diagnostic", " ", "for", " ", 
+      SubscriptBox["I", "1"]}], " ", "-", " ", 
+     SubscriptBox["I", "2"]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"RaD", "[", 
+     RowBox[{"(*", 
+      RowBox[{"host", " ", "pool"}], "*)"}], 
+     RowBox[{"hp_", ",", 
+      RowBox[{"(*", 
+       RowBox[{"positive", " ", "fraction"}], "*)"}], "pf_"}], "]"}], ":=", 
+    "\[IndentingNewLine]", 
+    RowBox[{"RandomSample", "[", 
+     RowBox[{"hp", ",", 
+      RowBox[{"Round", "[", 
+       RowBox[{"pf", " ", 
+        RowBox[{"Length", "@", "hp"}]}], "]"}]}], "]"}]}]}]}]], "Input",
+ CellChangeTimes->{3.796692455655632*^9},
+ CellLabel->
+  "In[106]:=",ExpressionUUID->"d19d8da5-a501-49bd-9e09-d939979fcf02"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Mixing", "Subsubsection",
+ CellChangeTimes->{{3.796827418253672*^9, 
+  3.796827423775894*^9}},ExpressionUUID->"37566a71-96e6-4a0c-a09a-\
+81d633c60fc2"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"Infected", " ", "patient"}], "-", 
+    RowBox[{"source", " ", "for", " ", "n", " ", "visits", " ", "into", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"infected", "-", "m"}], "<", 
+       RowBox[{"p", "-", "total"}]}], ")"}], " ", "pool"}]}], "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"RHg", "[", 
+     RowBox[{"n_", ",", 
+      RowBox[{"(*", "infected", "*)"}], "m_", ",", 
+      RowBox[{"(*", 
+       RowBox[{"total", " ", "pool"}], "*)"}], "p_"}], "]"}], ":=", 
+    RowBox[{"RandomVariate", "[", 
+     RowBox[{"HypergeometricDistribution", "[", 
+      RowBox[{"n", ",", "m", ",", "p"}], "]"}], "]"}]}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Infectivity", " ", 
+      RowBox[{"association", ":", " ", "stage"}]}], "\[Rule]", 
+     SubscriptBox["p", "i"]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"InA", "[", "ip_", "]"}], ":=", 
+     RowBox[{"Append", "[", 
+      RowBox[{
+       RowBox[{"AssociationThread", "[", 
+        RowBox[{
+         RowBox[{"Range", "[", 
+          RowBox[{"0", ",", "4"}], "]"}], "\[Rule]", 
+         RowBox[{"Most", "@", "ip"}]}], "]"}], ",", 
+       RowBox[{"(*", 
+        RowBox[{"patient", " ", "infectivity"}], "*)"}], 
+       RowBox[{"P", "\[Rule]", 
+        RowBox[{"Last", "@", "ip"}]}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Probability", " ", "of", " ", "infection", " ", "0"}], 
+      "\[Rule]", 
+      RowBox[{
+      "1", " ", "for", " ", "contact", " ", "within", " ", "cluster"}]}], " ",
+      "=", " ", "ci"}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"PrI", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"(*", 
+         RowBox[{"contact", " ", "cluster"}], "*)"}], 
+        RowBox[{"ci_", ",", 
+         RowBox[{"(*", 
+          RowBox[{"host", " ", "suceptibility"}], "*)"}], "s_"}], "}"}], ",", 
+       RowBox[{"(*", 
+        RowBox[{"graded", " ", "infecivity"}], "*)"}], "ip_"}], "]"}], ":=", 
+     "\[IndentingNewLine]", 
+     RowBox[{"1", "-", 
+      RowBox[{"Times", "@@", 
+       RowBox[{"(", 
+        RowBox[{"1", "-", 
+         RowBox[{"(*", 
+          RowBox[{"suceptibility", " ", "x", " ", "infectivity"}], "*)"}], 
+         RowBox[{"s", " ", 
+          RowBox[{
+           RowBox[{"InA", "[", "ip", "]"}], "/@", "ci"}]}]}], ")"}]}]}]}], 
+    ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{"No", " ", "contact"}], "*)"}], 
+   RowBox[{
+    RowBox[{
+     RowBox[{"PrI", "[", 
+      RowBox[{
+       RowBox[{"{", "s_", "}"}], ",", "ip_"}], "]"}], ":=", "0"}], 
+    ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.7937112142952724`*^9, 3.793711223004919*^9}, 
+   3.793711504809348*^9, 3.7937125434635468`*^9, 3.7960656988700447`*^9, {
+   3.796065912188737*^9, 3.7960659139564457`*^9}, 3.7962241288374414`*^9, {
+   3.7963942429230466`*^9, 3.7963942496164865`*^9}, {3.796828590559799*^9, 
+   3.796828591764703*^9}, {3.7968286811034536`*^9, 3.796828715364636*^9}, {
+   3.796828797318163*^9, 3.79682880919779*^9}, {3.7968288727957506`*^9, 
+   3.7968288891273136`*^9}, 3.7968289356583457`*^9, {3.801150117558792*^9, 
+   3.801150119304982*^9}},
+ CellTags->{"Code 1", "Random mixing"},
+ CellLabel->
+  "In[114]:=",ExpressionUUID->"c4bd937b-c6e8-4838-b0c5-fba512a786ab"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+   "Map", " ", "each", " ", "element", " ", "to", " ", "its", " ", "mixing", 
+    " ", "pool", " ", "po"}], "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"MaP", "[", "po_", "]"}], ":=", 
+    RowBox[{"If", "[", 
+     RowBox[{
+      RowBox[{"po", "\[Equal]", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"{", "}"}], ",", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"#", "\[Rule]", 
+          RowBox[{"Complement", "[", 
+           RowBox[{"po", ",", 
+            RowBox[{"{", "#", "}"}]}], "]"}]}], ")"}], "&"}], "/@", "po"}]}], 
+     "]"}]}], ";"}]}]], "Input",
+ CellChangeTimes->{{3.7937112142952724`*^9, 3.793711223004919*^9}, 
+   3.793711504809348*^9, 3.7937125434635468`*^9, 3.7960656988700447`*^9, {
+   3.796065912188737*^9, 3.7960659139564457`*^9}, 3.7962241288374414`*^9, {
+   3.7963942429230466`*^9, 3.7963942496164865`*^9}, {3.796828590559799*^9, 
+   3.796828591764703*^9}, {3.7968286811034536`*^9, 3.796828715364636*^9}, {
+   3.796828797318163*^9, 3.79682880919779*^9}, {3.7968288727957506`*^9, 
+   3.7968288891273136`*^9}, 3.7968289356583457`*^9, 3.8008855939930286`*^9, {
+   3.8008859334620323`*^9, 3.8008859497981014`*^9}, {3.8008861319168105`*^9, 
+   3.800886196541998*^9}},
+ CellTags->{"Code 1", "Random mixing"},
+ CellLabel->
+  "In[118]:=",ExpressionUUID->"726e84ca-9ce1-4e7d-b6d6-1ca028456eca"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RanC", "[", 
+    RowBox[{"hp_", ",", 
+     RowBox[{"{", 
+      RowBox[{"n_", ",", "m_"}], "}"}]}], "]"}], ":=", 
+   RowBox[{"If", "[", 
+    RowBox[{
+     RowBox[{"n", "\[Equal]", "0"}], ",", 
+     RowBox[{"{", "}"}], ",", 
+     RowBox[{"RandomChoice", "[", 
+      RowBox[{"hp", ",", 
+       RowBox[{"{", 
+        RowBox[{"n", ",", "m"}], "}"}]}], "]"}]}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.7937112142952724`*^9, 3.793711223004919*^9}, 
+   3.793711504809348*^9, 3.7937125434635468`*^9, 3.7960656988700447`*^9, {
+   3.796065912188737*^9, 3.7960659139564457`*^9}, 3.7962241288374414`*^9, {
+   3.7963942429230466`*^9, 3.7963942496164865`*^9}, {3.796828590559799*^9, 
+   3.796828591764703*^9}, {3.7968286811034536`*^9, 3.796828715364636*^9}, {
+   3.796828797318163*^9, 3.79682880919779*^9}, {3.7968288727957506`*^9, 
+   3.7968288891273136`*^9}, 3.7968289356583457`*^9, 3.8008855939930286`*^9, {
+   3.8008859334620323`*^9, 3.8008859497981014`*^9}, {3.8008861319168105`*^9, 
+   3.8008861612867303`*^9}, 3.800886362453436*^9},
+ CellTags->{"Code 1", "Random mixing"},
+ CellLabel->
+  "In[119]:=",ExpressionUUID->"267f1ce6-0180-4a66-93a6-41181bbd538c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Random", " ", "mixing", " ", "pool"}], "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"RMX", "[", 
+     RowBox[{"(*", 
+      RowBox[{"host", " ", "pool"}], "*)"}], 
+     RowBox[{"hp_", ",", 
+      RowBox[{"(*", 
+       RowBox[{"mixing", " ", "input"}], "*)"}], "mip_"}], "]"}], ":=", 
+    "\[IndentingNewLine]", 
+    RowBox[{"With", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"pz", "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"RanC", "[", 
+           RowBox[{"hp", ",", "#"}], "]"}], "&"}], "/@", "mip"}]}], "}"}], 
+      ",", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Host", " ", "mixing", " ", "clusters"}], "*)"}], 
+      "\[IndentingNewLine]", 
+      RowBox[{"Merge", "[", 
+       RowBox[{
+        RowBox[{"Map", "[", 
+         RowBox[{"MaP", ",", "pz", ",", 
+          RowBox[{"{", "2", "}"}]}], "]"}], ",", 
+        RowBox[{
+         RowBox[{"Union", "@@", "#"}], "&"}]}], "]"}]}], "]"}]}], 
+   ";"}]}]], "Input",
+ CellChangeTimes->{{3.7937112142952724`*^9, 3.793711223004919*^9}, 
+   3.793711504809348*^9, 3.7937125434635468`*^9, 3.7960656988700447`*^9, {
+   3.796065912188737*^9, 3.7960659139564457`*^9}, 3.7962241288374414`*^9, {
+   3.7963942429230466`*^9, 3.7963942496164865`*^9}, {3.796828590559799*^9, 
+   3.796828591764703*^9}, {3.7968286811034536`*^9, 3.796828715364636*^9}, {
+   3.796828797318163*^9, 3.79682880919779*^9}, {3.7968288727957506`*^9, 
+   3.7968288891273136`*^9}, 3.7968289356583457`*^9, 3.8008855939930286`*^9, {
+   3.8008859334620323`*^9, 3.8008859497981014`*^9}, {3.8008861319168105`*^9, 
+   3.8008861612867303`*^9}, 3.800886362453436*^9},
+ CellTags->{"Code 1", "Random mixing"},
+ CellLabel->
+  "In[120]:=",ExpressionUUID->"f94b8a9e-c324-4523-8c80-cb9b8ac1ff9e"]
+}, Open  ]],
+
+Cell["Community", "Subsubsection",
+ CellChangeTimes->{{3.7968275112057705`*^9, 
+  3.796827513044793*^9}},ExpressionUUID->"deb1feb5-dc9f-4326-91fc-\
+059ad84d8f97"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Initialize", "Subsection",
+ CellChangeTimes->{{3.796393599515217*^9, 
+  3.7963936064192247`*^9}},ExpressionUUID->"6cf2147e-0d9c-4f3f-9646-\
+62b7a8fc622c"],
+
+Cell[CellGroupData[{
+
+Cell["Progress patterns", "Subsubsection",
+ CellChangeTimes->{{3.796344591887105*^9, 3.7963446393621416`*^9}, {
+  3.7963446731754246`*^9, 3.796344704058214*^9}, {3.796344752076811*^9, 
+  3.7963447716351643`*^9}, {3.7963448105499277`*^9, 
+  3.7963448195883036`*^9}},ExpressionUUID->"0e065b42-a7a0-4e7e-8310-\
+7e27933a87b9"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Asymptomatic", "/", "light"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"AsP", "=", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"(*", "Length", "*)"}], "10", "}"}], ",", 
+       RowBox[{"(*", "steps", "*)"}], 
+       RowBox[{"{", "3", "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", "Moderate", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"MdP", "=", 
+     RowBox[{"{", 
+      RowBox[{"(*", "L", "*)"}], 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"5", ",", "9"}], "}"}], ",", 
+       RowBox[{"(*", "steps", "*)"}], 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}]}], "}"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", "Severe", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"SvP", "=", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"5", ",", "3", ",", "14"}], "}"}], ",", 
+       RowBox[{"(*", "steps", "*)"}], 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1", ",", "1"}], "}"}]}], "}"}]}], ";"}], 
+   "\n"}]}]], "Input",
+ CellChangeTimes->{{3.796344591887105*^9, 3.7963446393621416`*^9}, {
+   3.7963446731754246`*^9, 3.796344704058214*^9}, {3.796344752076811*^9, 
+   3.7963447716351643`*^9}, 3.7963448105499277`*^9, {3.7963448727756624`*^9, 
+   3.796345058228073*^9}, {3.796345341715952*^9, 3.796345348989631*^9}, 
+   3.7963458083256636`*^9, {3.796347024480022*^9, 3.79634705122037*^9}, {
+   3.796347276263466*^9, 3.796347282895746*^9}, {3.796393687004777*^9, 
+   3.7963937189682083`*^9}, {3.7964872477296486`*^9, 
+   3.7964872903955207`*^9}, {3.7964875806067233`*^9, 3.796487582310904*^9}, {
+   3.7966669989206424`*^9, 3.7966669994950027`*^9}, 3.7966911865259066`*^9, 
+   3.796828208394425*^9, {3.7968282501183443`*^9, 3.796828436452571*^9}, {
+   3.7968285131699514`*^9, 3.7968285283072286`*^9}, {3.796895454823861*^9, 
+   3.796895499261833*^9}, {3.7994932547608213`*^9, 3.7994932567422132`*^9}, {
+   3.7994934087698107`*^9, 3.7994934089550047`*^9}, {3.799493648313691*^9, 
+   3.7994936705822678`*^9}, {3.799507105985536*^9, 3.799507109736174*^9}, {
+   3.80002205004585*^9, 3.800022051422614*^9}, 3.8001336503091784`*^9, 
+   3.800202619837048*^9},
+ CellLabel->
+  "In[124]:=",ExpressionUUID->"512aece4-a376-4467-8816-8f08cce43bbf"]
+}, Open  ]]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Ensemble CoG", "Section",
+ CellChangeTimes->{{3.796232914013644*^9, 3.7962329216277175`*^9}, {
+  3.7972917212297916`*^9, 3.797291722802363*^9}, {3.7994952734934607`*^9, 
+  3.79949527444273*^9}, {3.800202431957305*^9, 
+  3.800202432854487*^9}},ExpressionUUID->"b1857525-22d9-4a02-9b66-\
+8039538cf0b1"],
+
+Cell[CellGroupData[{
+
+Cell["Codes", "Subsection",
+ CellChangeTimes->{{3.8000228493324556`*^9, 
+  3.8000228506194177`*^9}},ExpressionUUID->"330fd1d6-0d35-40c3-ab23-\
+89924ef5016e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Social", " ", "mixing", " ", "counts"}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"mic1", "=", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"60", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"30", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"8", ",", "4"}], "}"}]}], "}"}]}], ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{"Initial", " ", "host", " ", "pool"}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{"NPo", "=", 
+     RowBox[{"Range", "[", 
+      RowBox[{"nC", "=", "171"}], "]"}]}], ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Random", " ", "natural", " ", 
+      RowBox[{"suceptibility", ":", " ", 
+       RowBox[{"weights", " ", 
+        RowBox[{"{", 
+         RowBox[{".4", ",", ".6"}], "}"}]}]}]}], "\[Rule]", 
+     RowBox[{
+      RowBox[{"(", "values", ")"}], 
+      RowBox[{"{", 
+       RowBox[{".5", ",", "1"}], "}"}]}]}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"NsO", "[", "a_", "]"}], "=", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"SeedRandom", "[", "4321", "]"}], ";", 
+       RowBox[{"RandomChoice", "[", 
+        RowBox[{
+         StyleBox[
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{".6", ",", ".4"}], "}"}], "\[Rule]", 
+           RowBox[{"{", 
+            RowBox[{".5", ",", "a"}], "}"}]}],
+          FontColor->RGBColor[1, 0, 0]], 
+         StyleBox[",",
+          FontColor->RGBColor[0, 0, 1]], "nC"}], "]"}]}], ")"}]}], ";"}], 
+   "\n", 
+   RowBox[{"(*", 
+    RowBox[{"Host", " ", "pool", " ", "with", " ", "suceptibility"}], "*)"}], 
+   "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"NPs", "[", "a_", "]"}], "=", 
+     RowBox[{"Thread", "[", 
+      RowBox[{"NPo", "->", 
+       RowBox[{"NsO", "[", "a", "]"}]}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"PGP", "[", "fc_", "]"}], ":=", "\[IndentingNewLine]", 
+     RowBox[{"Block", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"fraction", " ", "of", " ", "asymtomatic", " ", "AsP"}], 
+          ",", " ", 
+          RowBox[{"should", " ", "be", " ", "large"}]}], "*)"}], 
+        "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"nC1", "=", 
+          RowBox[{"Round", "[", 
+           RowBox[{"nC", " ", "fc"}], "]"}]}], ",", 
+         RowBox[{"(*", 
+          RowBox[{
+          "fraction", " ", "of", " ", "mild", " ", "symtomatic", " ", "MdP"}],
+           "*)"}], "\[IndentingNewLine]", 
+         RowBox[{"nC2", "=", 
+          RowBox[{"Round", "[", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{"1", "-", "fc"}], ")"}], "*", "0.8", " ", "nC"}], 
+           "]"}]}]}], "}"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{
+          RowBox[{
+          "Partition", " ", "total", " ", "pool", " ", "into", " ", 
+           "subgroups", " ", "based", " ", "on", " ", "diseases"}], "-", 
+          RowBox[{"progress", " ", 
+           RowBox[{"pattern", ":", " ", "subpool"}]}]}], "\[Rule]", 
+         RowBox[{"{", 
+          RowBox[{"pattern", ",", " ", 
+           RowBox[{"transition", " ", "steps"}]}], "}"}]}], "*)"}], 
+       "\[IndentingNewLine]", 
+       RowBox[{"<|", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"1", ",", 
+            RowBox[{"nC", "-", "nC1", "-", "1", "-", "nC2", "-", "1"}]}], 
+           "}"}], "\[Rule]", "SvP"}], ",", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"nC", "-", "nC1", "-", "1", "-", "nC2"}], ",", 
+            RowBox[{"nC", "-", "nC1", "-", "1"}]}], "}"}], "\[Rule]", "MdP"}],
+          ",", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"nC", "-", "nC1"}], ",", "nC"}], "}"}], "\[Rule]", 
+          "AsP"}]}], "|>"}]}], "]"}]}], ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"3", " ", "progress"}], "-", 
+     RowBox[{"group", " ", "ranges"}]}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"PGR", "[", "fc_", "]"}], ":=", 
+     RowBox[{"Range", "@@@", 
+      RowBox[{"Keys", "@", 
+       RowBox[{"PGP", "[", "fc", "]"}]}]}]}], ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Stage", "-", 
+       RowBox[{"specific", " ", "infectivity"}]}], " ", "=", " ", 
+      "\"\<probability transmission/contact\>\""}], ",", " ", 
+     RowBox[{
+      RowBox[{"S", "\[Rule]", "E"}], " ", "=", " ", 
+      RowBox[{"f", "-", 
+       RowBox[{"n", " ", "of", " ", "contact", " ", "pool"}]}]}]}], " ", 
+    "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Ip1", "[", "b_", "]"}], "=", 
+     RowBox[{
+      StyleBox["{",
+       FontColor->GrayLevel[0]], 
+      StyleBox[
+       RowBox[{"0", ",", 
+        RowBox[{".55", "b"}], ",", "b", ",", "b", ",", "0", ",", 
+        RowBox[{"(*", "patient", "*)"}], 
+        RowBox[{".55", "b"}]}],
+       FontColor->RGBColor[1, 0, 0]], 
+      StyleBox["}",
+       FontColor->GrayLevel[0]]}]}], 
+    StyleBox[";",
+     FontColor->GrayLevel[0]]}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Reduced", " ", "patient", " ", "infectivity", " ", "after", " ", "Jan", 
+     ".20"}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Ip2", "[", "b_", "]"}], "=", 
+     RowBox[{
+      StyleBox["{",
+       FontColor->GrayLevel[0]], 
+      StyleBox[
+       RowBox[{"0", ",", 
+        RowBox[{".55", "b"}], ",", "b", ",", "b", ",", "0", ",", 
+        RowBox[{"(*", "patient", "*)"}], "0.02"}],
+       FontColor->RGBColor[1, 0, 0]], 
+      StyleBox["}",
+       FontColor->GrayLevel[0]]}]}], 
+    StyleBox[";",
+     FontColor->GrayLevel[0]]}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"Initial", " ", "QP", " ", "quarantine"}], "*)"}], "\n", 
+   RowBox[{
+    RowBox[{"InQ", "=", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"<|", "|>"}], ",", 
+       RowBox[{"<|", "|>"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Initialize", " ", "with", " ", "single", " ", "infected", " ", "host", 
+     " ", "#13"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"InS", "=", 
+     RowBox[{"With", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"asp", "=", 
+         RowBox[{"SparseArray", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"(*", 
+             RowBox[{"infected", " ", "host"}], "*)"}], 
+            RowBox[{"13", "\[Rule]", 
+             RowBox[{"(*", 
+              RowBox[{"initial", " ", "infected", " ", "state"}], "*)"}], 
+             "1"}], "}"}], ",", 
+           RowBox[{"Length", "@", "NPo"}]}], "]"}]}], "}"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"AssociationThread", "[", 
+        RowBox[{"NPo", "\[Rule]", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"Normal", "[", "asp", "]"}], "/.", 
+           RowBox[{"(", 
+            RowBox[{"1", "\[Rule]", 
+             RowBox[{"{", 
+              RowBox[{"1", ",", "0"}], "}"}]}], ")"}]}], ")"}]}], "]"}]}], 
+      "]"}]}], ";"}], "\n", 
+   RowBox[{"(*", 
+    RowBox[{"Partition", " ", "into", " ", "progress", " ", "groups"}], 
+    "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"INB", "[", "fc_", "]"}], ":=", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Take", "[", 
+        RowBox[{"InS", ",", "#"}], "]"}], "&"}], "/@", 
+      RowBox[{"Keys", "@", 
+       RowBox[{"PGP", "[", "fc", "]"}]}]}]}], ";"}]}]}]], "Input",
+ CellChangeTimes->{
+  3.801296382958269*^9, {3.801316611030696*^9, 3.801316611721726*^9}, {
+   3.8051926348685093`*^9, 
+   3.805192635768034*^9}},ExpressionUUID->"68936e49-2839-4504-a3ef-\
+347da6b44441"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"strip", " ", "day", " ", "from", " ", "multi"}], "-", 
+    RowBox[{"level", " ", "dta"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"StrD", "[", "da_", "]"}], ":=", 
+   RowBox[{"Replace", "[", 
+    RowBox[{"da", ",", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"i_", ",", "_"}], "}"}], "\[Rule]", "i"}], ",", 
+     RowBox[{"(*", 
+      RowBox[{"lowest", " ", "level"}], "*)"}], 
+     RowBox[{"{", 
+      RowBox[{"-", "2"}], "}"}]}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.797091247161145*^9, 3.7970912921659327`*^9}, 
+   3.797091575126221*^9, 3.7972824689763045`*^9},
+ CellLabel->
+  "In[121]:=",ExpressionUUID->"f63ffd2e-96ce-4438-af78-5065cada983e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{
+    "Modified", " ", "code", " ", "with", " ", "random", " ", "diagnostics"}],
+     " ", "+", " ", 
+    RowBox[{"quarantine", ":", " ", 
+     RowBox[{
+      RowBox[{"store", " ", "QP"}], "-", "incidence"}]}]}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"CoG", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"(*", "Workpool", "*)"}], 
+      RowBox[{"WP_", ",", 
+       RowBox[{"(*", 
+        RowBox[{"quarantine", " ", "pool"}], "*)"}], "QP_", ",", 
+       RowBox[{"(*", 
+        RowBox[{"Quarantine", " ", "incidence"}], "*)"}], "qc_"}], "}"}], ",",
+      "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"graded", " ", "infectivity"}], "*)"}], "ip_", ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"mixing", " ", "pattern"}], "*)"}], "mip_", ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"susceptibility", " ", "association"}], "*)"}], "ns_", ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"asymptomatic", " ", "fraction"}], "*)"}], "fc_", ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{"patient", " ", "source", " ", "inputs"}], "*)"}], 
+     RowBox[{"{", 
+      RowBox[{"n_", ",", "m_", ",", "Np_"}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{
+       "random", " ", "diagnostic", " ", "fractions", " ", "for", " ", "I1"}],
+        ",", " ", "I2"}], "*)"}], 
+     RowBox[{"{", 
+      RowBox[{"f1_", ",", "f2_"}], "}"}]}], "]"}], ":=", 
+   "\[IndentingNewLine]", 
+   RowBox[{"Module", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"combined", " ", "WP"}], ",", 
+        RowBox[{"QP", " ", "progress", " ", "pools"}]}], "*)"}], 
+      RowBox[{
+       RowBox[{"wpz", "=", 
+        RowBox[{"(", 
+         RowBox[{"Join", "@@", "WP"}], ")"}]}], ",", 
+       RowBox[{"qpz", "=", 
+        RowBox[{"(", 
+         RowBox[{"Join", "@@", "QP"}], ")"}]}], ",", "\[IndentingNewLine]", 
+       "wk1", ",", "wk2", ",", "rtd", ",", "qtW", ",", "rwp", ",", "rqp", ",",
+        "wpA", ",", "qpA", ",", "wpC", ",", "wpb", ",", "keS", ",", "rcx", 
+       ",", "ipS", ",", "ipY", ",", "ipZ", ",", "prC", ",", "prD", ",", "Spr",
+        ",", 
+       RowBox[{"(*", 
+        RowBox[{"EIR", ","}], "*)"}], "prE", ",", "EIp"}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{"WP", " ", "I1"}], "-", "pool"}], "*)"}], 
+     RowBox[{
+      RowBox[{"wk1", "=", 
+       RowBox[{"Keys", "@", 
+        RowBox[{"Select", "[", 
+         RowBox[{"wpz", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{
+             RowBox[{"Length", "[", "#", "]"}], ">", "0"}], "&&", 
+            RowBox[{
+             RowBox[{"#", "[", 
+              RowBox[{"[", "1", "]"}], "]"}], "\[Equal]", "2"}]}], "&"}]}], 
+         "]"}]}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"WP", " ", "I2"}], "-", "pool"}], "*)"}], 
+      RowBox[{"wk2", "=", 
+       RowBox[{"Keys", "@", 
+        RowBox[{"Select", "[", 
+         RowBox[{"wpz", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{
+             RowBox[{"Length", "[", "#", "]"}], ">", "0"}], "&&", 
+            RowBox[{
+             RowBox[{"#", "[", 
+              RowBox[{"[", "1", "]"}], "]"}], "\[Equal]", "3"}]}], "&"}]}], 
+         "]"}]}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{"random", " ", "tests", " ", "draw", " ", "from", " ", "W"}], 
+       "*)"}], 
+      RowBox[{"rtd", "=", 
+       RowBox[{"Join", "[", 
+        RowBox[{
+         RowBox[{"RaD", "[", 
+          RowBox[{"wk1", ",", "f1"}], "]"}], ",", 
+         RowBox[{"RaD", "[", 
+          RowBox[{"wk2", ",", "f2"}], "]"}]}], "]"}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{"W", "\[Rule]", 
+        RowBox[{"Q", " ", "pool"}]}], "*)"}], 
+      RowBox[{"wtQ", "=", 
+       RowBox[{"KeyTake", "[", 
+        RowBox[{"WP", ",", "rtd"}], "]"}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{"Q", " ", "->", " ", 
+        RowBox[{"W", " ", "pool"}]}], "*)"}], 
+      RowBox[{"qtW", "=", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Select", "[", 
+           RowBox[{"#", ",", 
+            RowBox[{
+             RowBox[{"#", "\[Equal]", "4"}], "&"}]}], "]"}], "&"}], "/@", 
+         "QP"}], ")"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Remaining", " ", "WP"}], "*)"}], 
+      RowBox[{"rwp", "=", 
+       RowBox[{"MapThread", "[", 
+        RowBox[{"Complement", ",", 
+         RowBox[{"{", 
+          RowBox[{"WP", ",", "wtQ"}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Remaining", " ", "QP"}], "*)"}], 
+      RowBox[{"rqp", "=", 
+       RowBox[{"MapThread", "[", 
+        RowBox[{"Complement", ",", 
+         RowBox[{"{", 
+          RowBox[{"QP", ",", "qtW"}], "}"}]}], "]"}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Add", " ", "Q"}], "\[Rule]", 
+        RowBox[{"W", " ", "to", " ", "WP"}]}], "*)"}], 
+      RowBox[{"wpA", "=", 
+       RowBox[{"(", 
+        RowBox[{"MapThread", "[", 
+         RowBox[{"Join", ",", 
+          RowBox[{"{", 
+           RowBox[{"rwp", ",", 
+            RowBox[{"Append", "[", 
+             RowBox[{"qtW", ",", 
+              RowBox[{"(*", "AsP", "*)"}], 
+              RowBox[{"<|", "|>"}]}], "]"}]}], "}"}]}], "]"}], ")"}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Add", " ", "W"}], "\[Rule]", 
+        RowBox[{"Q", " ", "to", " ", "QP"}]}], "*)"}], 
+      RowBox[{"qpA", "=", 
+       RowBox[{"(", 
+        RowBox[{"MapThread", "[", 
+         RowBox[{"Join", ",", 
+          RowBox[{"{", 
+           RowBox[{"rqp", ",", 
+            RowBox[{"(*", 
+             RowBox[{
+              RowBox[{"add", " ", "SvP"}], "+", "MdP"}], "*)"}], 
+            RowBox[{"Most", "@", "wtQ"}]}], "}"}]}], "]"}], ")"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Combined", "/", "flat"}], " ", "WP", " ", "for", " ", 
+        "mixing"}], "*)"}], 
+      RowBox[{"wpC", "=", 
+       RowBox[{"Join", "@@", "wpA"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", " ", 
+       RowBox[{"S", " ", "WP"}], "*)"}], 
+      RowBox[{"keS", "=", 
+       RowBox[{"Keys", "@", 
+        RowBox[{"Select", "[", 
+         RowBox[{"wpC", ",", 
+          RowBox[{
+           RowBox[{"#", "\[Equal]", "0"}], "&"}]}], "]"}]}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Mixing", " ", "pool", " ", "of", " ", "all", " ", "WP"}], 
+       "*)"}], 
+      RowBox[{"rcx", "=", 
+       RowBox[{"RMX", "[", 
+        RowBox[{
+         RowBox[{"Keys", "@", "wpC"}], ",", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Round", "[", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{
+               FractionBox[
+                RowBox[{"Length", "@", "wpC"}], "171"], ",", "1"}], "}"}], 
+             "#"}], "]"}], "&"}], "/@", "mip"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Mixing", " ", "pool", " ", "of", " ", "S"}], "*)"}], 
+      RowBox[{"mpS", "=", 
+       RowBox[{"KeyTake", "[", 
+        RowBox[{"rcx", ",", 
+         RowBox[{"(*", 
+          RowBox[{"S", " ", "only"}], "*)"}], "keS"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Mixing", "-", 
+        RowBox[{"pools", " ", "for", " ", "S"}]}], "*)"}], 
+      RowBox[{"ipS", "=", 
+       RowBox[{"Map", "[", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Drop", " ", "day"}], ",", " ", 
+          RowBox[{"leave", " ", "state"}]}], "*)"}], 
+        RowBox[{
+         RowBox[{"StrD", "[", "wpC", "]"}], ",", "mpS", ",", 
+         RowBox[{"{", "2", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Augment", " ", "S", " ", "HCW"}], "-", 
+        RowBox[{"mixing", " ", "with", " ", "patient", " ", "source"}]}], 
+       "*)"}], 
+      RowBox[{"ipY", "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Join", "[", 
+          RowBox[{"#", ",", 
+           RowBox[{"Table", "[", 
+            RowBox[{"P", ",", 
+             RowBox[{"{", 
+              RowBox[{"(*", 
+               RowBox[{"patient", " ", "source"}], "*)"}], 
+              RowBox[{"RHg", "[", 
+               RowBox[{"n", ",", "m", ",", "Np"}], "]"}], "}"}]}], "]"}]}], 
+          "]"}], "&"}], "/@", "ipS"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Combine", " ", "contact"}], "-", 
+        RowBox[{"pool", " ", "with", " ", "sucseptibility"}]}], "*)"}], 
+      RowBox[{"ipZ", "=", 
+       RowBox[{"Merge", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"ipY", ",", 
+           RowBox[{"KeyTake", "[", 
+            RowBox[{"ns", ",", "keS"}], "]"}]}], "}"}], ",", 
+         RowBox[{"#", "&"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Probability", " ", "of", " ", "infection", " ", "S"}], 
+        "\[Rule]", "E"}], "*)"}], 
+      RowBox[{"prC", "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"PrI", "[", 
+          RowBox[{"#", ",", "ip"}], "]"}], "&"}], "/@", "ipZ"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Split", " ", "into", " ", "progress", " ", "groups"}], "*)"}], 
+      RowBox[{"prD", "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"KeyTake", "[", 
+          RowBox[{"prC", ",", "#"}], "]"}], "&"}], "/@", 
+        RowBox[{"PGR", "[", "fc", "]"}]}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"S", "-", 
+        RowBox[{"progress", " ", "by", " ", "group"}]}], "*)"}], 
+      RowBox[{"Spr", "=", 
+       RowBox[{
+        RowBox[{"Map", "[", 
+         RowBox[{"DPS", ",", "prD", ",", 
+          RowBox[{"{", "2", "}"}]}], "]"}], "/.", 
+        RowBox[{"(", 
+         RowBox[{"1", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", 
+            RowBox[{"(*", 
+             RowBox[{"day", " ", "0"}], "*)"}], "0"}], "}"}]}], ")"}]}]}], 
+      ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"flatten", " ", "E"}], "+", "I", "+", 
+        RowBox[{"R", " ", "pool"}]}], "*)"}], 
+      RowBox[{"EIR", "=", 
+       RowBox[{"Select", "[", 
+        RowBox[{"(*", 
+         RowBox[{"flat", " ", "WP"}], "*)"}], 
+        RowBox[{"wpC", ",", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Total", "@", "#"}], ">", "0"}], "&"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+       "Split", " ", "EIR", " ", "into", " ", "progress", " ", "groups"}], 
+       "*)"}], 
+      RowBox[{"prE", "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"KeyTake", "[", 
+          RowBox[{"EIR", ",", "#"}], "]"}], "&"}], "/@", 
+        RowBox[{"PGR", "[", "fc", "]"}]}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{"Disease", " ", "progress", " ", "for", " ", "EIR"}], "*)"}], 
+      RowBox[{"EIp", "=", 
+       RowBox[{
+        RowBox[{"MapThread", "[", 
+         RowBox[{"DPZ", ",", 
+          RowBox[{"{", 
+           RowBox[{"prE", ",", 
+            RowBox[{"Values", "@", 
+             RowBox[{"PGP", "[", "fc", "]"}]}]}], "}"}]}], "]"}], "/.", 
+        RowBox[{"(*", 
+         RowBox[{"drop", " ", "day"}], "*)"}], 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"4", ",", "_"}], "}"}], "\[Rule]", "4"}]}]}], ";", 
+      RowBox[{"(*", 
+       RowBox[{"final", " ", "community", " ", "state"}], "*)"}], 
+      "\[IndentingNewLine]", 
+      RowBox[{"Append", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"MapThread", "[", 
+           RowBox[{"Join", ",", 
+            RowBox[{"{", 
+             RowBox[{"(*", 
+              RowBox[{"S", " ", "rpogressed"}], "*)"}], 
+             RowBox[{"Spr", ",", 
+              RowBox[{"(*", 
+               RowBox[{"EIR", " ", "progressed"}], "*)"}], "EIp"}], "}"}]}], 
+           "]"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"(*", 
+           RowBox[{"Disease", " ", "progress", " ", "in", " ", "Q"}], "*)"}], 
+          RowBox[{
+           RowBox[{"MapThread", "[", 
+            RowBox[{"DPZ", ",", 
+             RowBox[{"{", 
+              RowBox[{"qpA", ",", 
+               RowBox[{"Values", "@", 
+                RowBox[{"(", 
+                 RowBox[{"Most", "@", 
+                  StyleBox[
+                   RowBox[{"PGP", "[", "fc", "]"}],
+                   FontColor->RGBColor[1, 0, 0]]}], 
+                 StyleBox[")",
+                  FontColor->RGBColor[1, 0, 0]]}]}]}], "}"}]}], "]"}], "/.", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"4", ",", "_"}], "}"}], "\[Rule]", "4"}]}]}], "}"}], ",", 
+        StyleBox["\[IndentingNewLine]",
+         FontColor->RGBColor[1, 0, 0]], 
+        RowBox[{
+         StyleBox["(*",
+          FontColor->GrayLevel[0]], "Qcount", "*)"}], 
+        RowBox[{"Length", "[", 
+         RowBox[{"Join", "@@", "wtQ"}], "]"}]}], "]"}]}]}], 
+    "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.800022925862769*^9, 3.8000229386359806`*^9}, {
+   3.8000231343413863`*^9, 3.8000231811303415`*^9}, {3.8000235588646708`*^9, 
+   3.8000235620689144`*^9}, {3.800134581707787*^9, 3.8001346004686317`*^9}, {
+   3.8001378932768764`*^9, 3.8001379212100043`*^9}, {3.8001379683854256`*^9, 
+   3.80013797204959*^9}, {3.8001380077061*^9, 3.8001380323209295`*^9}, 
+   3.8001380732325687`*^9, 3.800138122942539*^9, {3.800141292281313*^9, 
+   3.8001413620387793`*^9}, 3.800141790348254*^9, 3.800958157447878*^9},
+ CellLabel->
+  "In[138]:=",ExpressionUUID->"e0b59db5-4004-49bb-a4df-9147bd0b9e73"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"do", " ", "baseline", " ", 
+     RowBox[{"(", 
+      RowBox[{"no", " ", "intervention", " ", "at", " ", "all"}], ")"}]}], 
+    ",", " ", 
+    RowBox[{"full", " ", "patient", " ", "pull"}], ",", " ", 
+    RowBox[{
+    "no", " ", "different", " ", "infectivity", " ", "of", " ", "patient", 
+     " ", "before", " ", "and", " ", "after", " ", "Jan", " ", "19", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"0.55", "b1"}], ",", 
+       RowBox[{"0.55", "b1"}]}], ")"}]}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"bCWQC", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"a_", ",", 
+       RowBox[{"(*", 
+        RowBox[{"asymptomatic", " ", "fraction"}], "*)"}], "fc_", ",", 
+       RowBox[{"(*", "infectivity", "*)"}], "b_"}], "}"}], ",", 
+     RowBox[{"(*", "mixing", "*)"}], "mi1_", ",", 
+     RowBox[{"{", 
+      RowBox[{"n_", ",", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"infected", " ", "P"}], "-", "fraction"}], "*)"}], "fp_"}], 
+      "}"}], ",", 
+     RowBox[{"(*", 
+      RowBox[{"test", " ", "selection"}], "*)"}], "ff1_", ",", "ff2_"}], 
+    "]"}], ":=", "\[IndentingNewLine]", 
+   RowBox[{"Module", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"(*", 
+       RowBox[{
+       "Run", " ", "community", " ", "history", " ", "in", " ", "2", " ", 
+        "steps"}], "*)"}], 
+      RowBox[{
+      "Hi1", ",", "Hi2", ",", "HiB", ",", "HiWP", ",", "HiQP", ",", "HiQC"}], 
+      "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"Hi1", "=", "\[IndentingNewLine]", 
+       RowBox[{"NestList", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"CoG", "[", 
+           RowBox[{"#", ",", 
+            RowBox[{"(*", "infectivity", " ", "*)"}], 
+            RowBox[{"Ip1", "@", "b"}], ",", 
+            RowBox[{"(*", "mixing", "*)"}], "mi1", ",", "\[IndentingNewLine]", 
+            RowBox[{"NPs", "@", "a"}], ",", "fc", ",", "\[IndentingNewLine]", 
+            RowBox[{"{", 
+             RowBox[{"n", ",", 
+              RowBox[{"Round", "[", 
+               RowBox[{"(*", 
+                RowBox[{"infected", " ", "fraction"}], "*)"}], 
+               RowBox[{
+                StyleBox["fp",
+                 FontColor->RGBColor[1, 0, 0]], " ", "200"}], "]"}], ",", 
+              "200"}], "}"}], ",", 
+            StyleBox["ff1",
+             FontColor->RGBColor[1, 0, 0]]}], "]"}], "&"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"(*", 
+          RowBox[{"Initial", " ", "state"}], "*)"}], 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"INB", "@", "fc"}], ",", "InQ", ",", 
+           RowBox[{"(*", 
+            RowBox[{"initial", " ", "count"}], "*)"}], "0"}], "}"}], ",", 
+         RowBox[{"(*", "days", "*)"}], "13"}], "]"}]}], ";", "\n", 
+      RowBox[{"Hi2", "=", "\[IndentingNewLine]", 
+       RowBox[{"NestList", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"CoG", "[", 
+           RowBox[{"#", ",", 
+            RowBox[{"(*", 
+             RowBox[{"infectivity", " ", "level"}], "*)"}], 
+            RowBox[{"Ip1", "@", "b"}], ",", 
+            RowBox[{"(*", "mixing", "*)"}], "mi1", ",", "\[IndentingNewLine]", 
+            RowBox[{"NPs", "@", "a"}], ",", "fc", ",", "\[IndentingNewLine]", 
+            RowBox[{"{", 
+             RowBox[{"n", ",", 
+              RowBox[{"Round", "[", 
+               RowBox[{"(*", 
+                RowBox[{"infected", " ", "fraction"}], "*)"}], 
+               RowBox[{"fp", " ", "200"}], "]"}], ",", "200"}], "}"}], ",", 
+            StyleBox["ff2",
+             FontColor->RGBColor[1, 0, 0]]}], "]"}], "&"}], ",", 
+         RowBox[{"Last", "@", "Hi1"}], ",", "167"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Combined", " ", "history", " ", "split", " ", 
+        RowBox[{"{", 
+         RowBox[{"WP", ",", "QP"}], "}"}]}], "*)"}], "\[IndentingNewLine]", 
+      RowBox[{"HiB", "=", 
+       RowBox[{"Join", "[", 
+        RowBox[{"Hi1", ",", 
+         RowBox[{"Rest", "@", "Hi2"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"Split", " ", 
+        RowBox[{"{", 
+         RowBox[{"WP", ",", "QP"}], "}"}], " ", "histories"}], "*)"}], 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"HiWP", ",", "HiQP", ",", "HiQC"}], "}"}], "=", 
+       RowBox[{"Thread", "@", "HiB"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"(*", "Outputs", "*)"}], "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"(*", 
+         RowBox[{"WP", "-", "counts"}], "*)"}], 
+        RowBox[{
+         RowBox[{"Merge", "[", 
+          RowBox[{
+           RowBox[{"KeyUnion", "[", 
+            RowBox[{"Counts", "/@", 
+             RowBox[{"StrD", "[", 
+              RowBox[{"Join", "@@@", "HiWP"}], "]"}]}], "]"}], ",", 
+           RowBox[{"#", "&"}]}], "]"}], ",", "\[IndentingNewLine]", 
+         RowBox[{"(*", 
+          RowBox[{"QP", "-", "counts"}], "*)"}], 
+         RowBox[{"Merge", "[", 
+          RowBox[{
+           RowBox[{"KeyUnion", "[", 
+            RowBox[{"Counts", "/@", 
+             RowBox[{"StrD", "[", 
+              RowBox[{"Join", "@@@", "HiQP"}], "]"}]}], "]"}], ",", 
+           RowBox[{"#", "&"}]}], "]"}], ",", "\[IndentingNewLine]", 
+         RowBox[{"(*", 
+          RowBox[{"QP", " ", "incidence"}], "*)"}], "HiQC"}], "}"}], "/.", 
+       RowBox[{
+        RowBox[{"Missing", "[", "__", "]"}], "\[Rule]", "0"}]}]}]}], 
+    "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.7908001488366756`*^9, 3.79080020728141*^9}, {
+   3.790800260541934*^9, 3.7908003423800526`*^9}, 3.7908033705964756`*^9, {
+   3.790803853444624*^9, 3.790803890822686*^9}, 3.7908710460129747`*^9, {
+   3.790883611254569*^9, 3.7908836647709684`*^9}, {3.7908837486130323`*^9, 
+   3.7908837877972703`*^9}, {3.790884020816547*^9, 3.7908841025319867`*^9}, {
+   3.7908857007871394`*^9, 3.7908857047430573`*^9}, 3.790885860848668*^9, 
+   3.7915863421501436`*^9, {3.79159841078082*^9, 3.791598442919962*^9}, {
+   3.791653720432132*^9, 3.7916537311235523`*^9}, {3.791908255310727*^9, 
+   3.7919082578123884`*^9}, 3.791908385074359*^9, {3.7919084464499097`*^9, 
+   3.7919084490988216`*^9}, {3.791986911317913*^9, 3.7919869135414867`*^9}, {
+   3.7920048527033873`*^9, 3.7920048653758974`*^9}, {3.792005837156556*^9, 
+   3.7920058702414227`*^9}, {3.7920820951434655`*^9, 
+   3.7920821071991997`*^9}, {3.7920821574395027`*^9, 3.7920821866738605`*^9}, 
+   3.7920822190498357`*^9, {3.792086953887909*^9, 3.7920869572469544`*^9}, {
+   3.7925124072933335`*^9, 3.7925124366983256`*^9}, {3.793643170924091*^9, 
+   3.793643176440346*^9}, {3.7936432261823163`*^9, 3.7936432404162436`*^9}, 
+   3.7936434084957585`*^9, {3.7936504837148886`*^9, 3.7936505389726267`*^9}, {
+   3.793650618093403*^9, 3.7936506242882037`*^9}, {3.7936506668899093`*^9, 
+   3.793650689927082*^9}, 3.7936507211560364`*^9, {3.7936564161484957`*^9, 
+   3.7936564788891797`*^9}, {3.7936565557027545`*^9, 3.793656566096079*^9}, 
+   3.7936566158823204`*^9, 3.7936572671073275`*^9, {3.793657433250967*^9, 
+   3.793657457256767*^9}, 3.793657501066606*^9, 3.793657630506487*^9, {
+   3.7937162274548173`*^9, 3.7937162281988697`*^9}, 3.7937162821776433`*^9, {
+   3.7937163192618246`*^9, 3.793716371173994*^9}, 3.7937164027046785`*^9, {
+   3.7948455013301315`*^9, 3.794845533572881*^9}, {3.795261059149435*^9, 
+   3.7952610911382236`*^9}, {3.795444451942845*^9, 3.795444478405281*^9}, 
+   3.795444513055276*^9, {3.795444556393076*^9, 3.7954445819765987`*^9}, {
+   3.7962239001591578`*^9, 3.7962239006348424`*^9}, 3.796226527180607*^9, {
+   3.7962303397299037`*^9, 3.7962303655706396`*^9}, 3.7963215919037466`*^9, {
+   3.7964368524820943`*^9, 3.796436899324638*^9}, {3.796437004279584*^9, 
+   3.7964370044929724`*^9}, {3.7966673848407803`*^9, 
+   3.7966673894226723`*^9}, {3.7968291188834686`*^9, 3.796829236495952*^9}, 
+   3.7968292722518997`*^9, {3.796829324094407*^9, 3.7968293247045593`*^9}, 
+   3.7968311062950563`*^9, 3.7968332795826607`*^9, 3.7968336632790613`*^9, 
+   3.797086225850646*^9, {3.7972828281012316`*^9, 3.797282908774785*^9}, {
+   3.7972829824582148`*^9, 3.7972831074010525`*^9}, {3.7972831400569215`*^9, 
+   3.7972831550513372`*^9}, {3.797283411643371*^9, 3.7972834756519885`*^9}, {
+   3.797283520944481*^9, 3.7972835325087137`*^9}, {3.7972835662142973`*^9, 
+   3.7972836205845337`*^9}, {3.7972836724336596`*^9, 
+   3.7972836965310907`*^9}, {3.797283790524144*^9, 3.7972839852416515`*^9}, {
+   3.7972840442427616`*^9, 3.797284054410308*^9}, {3.7973600849417396`*^9, 
+   3.7973601144916925`*^9}, {3.799505916801709*^9, 3.7995059173449087`*^9}, {
+   3.799505980590559*^9, 3.7995060201038837`*^9}, {3.799923773929975*^9, 
+   3.799923808050372*^9}, 3.799924080629319*^9, {3.799924566794654*^9, 
+   3.799924606000092*^9}, {3.799924687148847*^9, 3.7999247662946978`*^9}, 
+   3.799924809809847*^9, 3.799924868496372*^9, 3.800025201936815*^9, {
+   3.8000252815079594`*^9, 3.800025352020825*^9}, {3.800025423619842*^9, 
+   3.80002544423459*^9}, {3.800026539766281*^9, 3.8000265494700007`*^9}, {
+   3.8000265804361115`*^9, 3.8000266575240135`*^9}, 3.8001347498591547`*^9, {
+   3.800134879082553*^9, 3.8001349165553503`*^9}, {3.800134990341079*^9, 
+   3.800134991496952*^9}, {3.8001350547707777`*^9, 3.800135063081568*^9}, {
+   3.8001361865185843`*^9, 3.8001362222051587`*^9}, {3.800136327207703*^9, 
+   3.800136372726982*^9}, 3.8001364054344873`*^9, {3.80013644872672*^9, 
+   3.800136507268243*^9}, {3.800136543937235*^9, 3.8001365505475745`*^9}, {
+   3.800137008105976*^9, 3.8001370181421394`*^9}, 3.8001372721213303`*^9, 
+   3.800137329399278*^9, 3.8001373614553986`*^9, {3.8001374173490744`*^9, 
+   3.8001374186935196`*^9}, {3.8001379273237114`*^9, 3.8001379281893563`*^9}, 
+   3.8001380356649885`*^9, 3.8001380796972275`*^9, 3.8001381265050135`*^9, {
+   3.8011522402674103`*^9, 3.801152241038741*^9}, {3.801152285017626*^9, 
+   3.801152302997181*^9}, {3.801153285833543*^9, 3.801153286468954*^9}, {
+   3.8011534660865393`*^9, 3.801153472352522*^9}, {3.8012387255375967`*^9, 
+   3.8012387259960938`*^9}, {3.80123978901731*^9, 3.801239793021983*^9}, {
+   3.801240306981213*^9, 3.801240309693151*^9}, {3.8012406672849627`*^9, 
+   3.801240673118951*^9}, {3.8012417955940027`*^9, 3.801241819904367*^9}, {
+   3.801242166310644*^9, 3.80124217611243*^9}, {3.8015728558268843`*^9, 
+   3.801572945514732*^9}, {3.8015729840337343`*^9, 3.801572984867413*^9}, {
+   3.801573608198883*^9, 3.80157362320227*^9}, {3.801575151840366*^9, 
+   3.8015751629098597`*^9}, {3.8031930847084293`*^9, 3.803193086177137*^9}, {
+   3.80319311995534*^9, 3.803193187929605*^9}, {3.80319322459853*^9, 
+   3.803193256399941*^9}, 3.8031933315896053`*^9, {3.8031933801268873`*^9, 
+   3.803193401863078*^9}, {3.803193580779356*^9, 3.803193592042461*^9}, {
+   3.803193633078644*^9, 3.803193640093479*^9}, {3.803289486091852*^9, 
+   3.8032895107864943`*^9}, {3.803296764954459*^9, 3.80329676584334*^9}, {
+   3.803298360440637*^9, 3.803298361204821*^9}, {3.803301003182622*^9, 
+   3.803301003774691*^9}, {3.8033029234051523`*^9, 3.803302948091189*^9}},
+ CellLabel->"In[35]:=",ExpressionUUID->"812a90d4-6b0d-49b4-a774-73c86d11dc66"]
+}, Open  ]],
+
+Cell["", "Subsection",ExpressionUUID->"033774a0-fd21-4a20-8eca-f016618a68c6"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Wuhan data", "Section",
+ CellChangeTimes->{{3.805673967549636*^9, 
+  3.805673969598633*^9}},ExpressionUUID->"f51e8727-5109-4944-9500-\
+95a90623a788"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Aggregated", " ", "Symptom", " ", "outbreak"}], "*)"}], "\n", 
+  RowBox[{"symT", "=", 
+   RowBox[{"\[LeftAssociation]", 
+    RowBox[{
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Wed 8 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "8", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sat 11 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "11", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "3"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sun 12 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              RowBox[{
+               "2020", ",", "1", ",", "12", ",", "0", ",", "0", ",", "0.`"}], 
+              "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "5"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Mon 13 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "13", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "4"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Tue 14 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "14", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "4"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Wed 15 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "15", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "5"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Thu 16 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "16", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "8"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Fri 17 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "17", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "7"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sat 18 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "18", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "4"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sun 19 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "19", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "5"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Mon 20 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "20", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "10"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Tue 21 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "21", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "11"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Wed 22 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "22", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "6"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Thu 23 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "23", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "3"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Fri 24 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "24", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sat 25 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "25", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "7"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sun 26 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "26", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Mon 27 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "27", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Thu 30 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "30", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Fri 31 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "31", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Mon 3 Feb 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "4.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "2", ",", "3", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "4.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}]}], 
+    "\[RightAssociation]"}]}]}]], "Input",
+ CellChangeTimes->{{3.795106836403256*^9, 3.795106840938117*^9}, {
+   3.795106932908949*^9, 3.7951070040665874`*^9}, 3.795107323584241*^9, {
+   3.7951100906108427`*^9, 3.795110095823303*^9}, {3.7951105744258327`*^9, 
+   3.795110575124178*^9}, {3.805673986702991*^9, 3.805673997961978*^9}},
+ CellLabel->"In[73]:=",ExpressionUUID->"9580990e-b9f9-434d-89d0-7b1d6a68ab1b"],
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"Aggregated", " ", 
+    RowBox[{"Quarantine", "/", "isolated"}], " ", "dates"}], "**)"}], "\n", 
+  RowBox[{"trD", "=", 
+   RowBox[{"\[LeftAssociation]", 
+    RowBox[{
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sat 11 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "11", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sun 12 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "12", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{"\"\<None\>\"", "\[Rule]", "44"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sun 19 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "19", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "15"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Thu 16 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "16", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Wed 22 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "22", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "9"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sat 18 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "18", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Wed 15 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "15", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Mon 27 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "27", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Fri 24 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "24", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Mon 20 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "20", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "4"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Thu 23 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "23", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Fri 31 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "31", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Wed 29 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "29", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sat 25 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "25", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sun 26 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "26", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "2"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Thu 30 Jan 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "1", ",", "30", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      TemplateBox[{
+        RowBox[{"\"Sat 1 Feb 2020 00:00:00\"", 
+          StyleBox[
+           RowBox[{"\"GMT\"", "\[InvisibleSpace]", 
+             StyleBox[
+              RowBox[{"-", "6.`"}], NumberMarks -> False, StripOnInput -> 
+              False]}], FontColor -> GrayLevel[0.5]]}], 
+        RowBox[{"DateObject", "[", 
+          RowBox[{
+            RowBox[{"{", 
+              
+              RowBox[{"2020", ",", "2", ",", "1", ",", "0", ",", "0", ",", 
+                "0.`"}], "}"}], ",", "\"Instant\"", ",", "\"Gregorian\"", ",", 
+            RowBox[{"-", "6.`"}]}], "]"}]},
+       "DateObject",
+       Editable->False], "\[Rule]", "1"}]}], 
+    "\[RightAssociation]"}]}]}]], "Input",
+ CellChangeTimes->{{3.795106836403256*^9, 3.795106840938117*^9}, {
+   3.795106932908949*^9, 3.7951070040665874`*^9}, 3.795107323584241*^9, {
+   3.7951075229784555`*^9, 3.7951075833781033`*^9}, {3.795183882185096*^9, 
+   3.7951838872734547`*^9}, {3.805674041740398*^9, 3.805674077351283*^9}},
+ CellLabel->"In[74]:=",ExpressionUUID->"e5d08509-c499-4c13-9a82-46fc256153bb"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowToolbars->"EditBar",
+WindowSize->{1077, 712},
+WindowMargins->{{123, Automatic}, {Automatic, 0}},
+Magnification:>1.25 Inherited,
+FrontEndVersion->"12.1 for Mac OS X x86 (64-bit) (March 18, 2020)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"0123b0e4-e5c9-4992-9602-62d3c2190191"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "Code 1"->{
+  Cell[7852, 234, 3327, 89, 228, "Input",ExpressionUUID->"c4bd937b-c6e8-4838-b0c5-fba512a786ab",
+   CellTags->{"Code 1", "Random mixing"}],
+  Cell[11182, 325, 1399, 33, 60, "Input",ExpressionUUID->"726e84ca-9ce1-4e7d-b6d6-1ca028456eca",
+   CellTags->{"Code 1", "Random mixing"}],
+  Cell[12584, 360, 1202, 26, 35, "Input",ExpressionUUID->"267f1ce6-0180-4a66-93a6-41181bbd538c",
+   CellTags->{"Code 1", "Random mixing"}],
+  Cell[13789, 388, 1795, 44, 132, "Input",ExpressionUUID->"f94b8a9e-c324-4523-8c80-cb9b8ac1ff9e",
+   CellTags->{"Code 1", "Random mixing"}]},
+ "Random mixing"->{
+  Cell[7852, 234, 3327, 89, 228, "Input",ExpressionUUID->"c4bd937b-c6e8-4838-b0c5-fba512a786ab",
+   CellTags->{"Code 1", "Random mixing"}],
+  Cell[11182, 325, 1399, 33, 60, "Input",ExpressionUUID->"726e84ca-9ce1-4e7d-b6d6-1ca028456eca",
+   CellTags->{"Code 1", "Random mixing"}],
+  Cell[12584, 360, 1202, 26, 35, "Input",ExpressionUUID->"267f1ce6-0180-4a66-93a6-41181bbd538c",
+   CellTags->{"Code 1", "Random mixing"}],
+  Cell[13789, 388, 1795, 44, 132, "Input",ExpressionUUID->"f94b8a9e-c324-4523-8c80-cb9b8ac1ff9e",
+   CellTags->{"Code 1", "Random mixing"}]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"Code 1", 80287, 2077},
+ {"Random mixing", 80869, 2086}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 316, 5, 123, "Title",ExpressionUUID->"40facf5d-ae8c-48da-9d4e-d395851ba7e2"],
+Cell[899, 29, 330, 5, 67, "Subtitle",ExpressionUUID->"afbb50e3-3efd-48f0-a475-c47419c5383d"],
+Cell[CellGroupData[{
+Cell[1254, 38, 233, 4, 84, "Section",ExpressionUUID->"27f581af-d03a-4697-9472-406739c12add"],
+Cell[1490, 44, 1282, 32, 110, "Text",ExpressionUUID->"8777a08f-68f6-49f4-bc69-8f587a43703c"],
+Cell[CellGroupData[{
+Cell[2797, 80, 155, 3, 67, "Subsection",ExpressionUUID->"6a2bbb26-d7d5-4987-9211-a0931e1d8870"],
+Cell[CellGroupData[{
+Cell[2977, 87, 296, 5, 56, "Subsubsection",ExpressionUUID->"0dbd670d-43bb-4e5c-86d5-b87bbef7e44c"],
+Cell[3276, 94, 4379, 130, 478, "Input",ExpressionUUID->"d19d8da5-a501-49bd-9e09-d939979fcf02"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7692, 229, 157, 3, 56, "Subsubsection",ExpressionUUID->"37566a71-96e6-4a0c-a09a-81d633c60fc2"],
+Cell[7852, 234, 3327, 89, 228, "Input",ExpressionUUID->"c4bd937b-c6e8-4838-b0c5-fba512a786ab",
+ CellTags->{"Code 1", "Random mixing"}],
+Cell[11182, 325, 1399, 33, 60, "Input",ExpressionUUID->"726e84ca-9ce1-4e7d-b6d6-1ca028456eca",
+ CellTags->{"Code 1", "Random mixing"}],
+Cell[12584, 360, 1202, 26, 35, "Input",ExpressionUUID->"267f1ce6-0180-4a66-93a6-41181bbd538c",
+ CellTags->{"Code 1", "Random mixing"}],
+Cell[13789, 388, 1795, 44, 132, "Input",ExpressionUUID->"f94b8a9e-c324-4523-8c80-cb9b8ac1ff9e",
+ CellTags->{"Code 1", "Random mixing"}]
+}, Open  ]],
+Cell[15599, 435, 162, 3, 56, "Subsubsection",ExpressionUUID->"deb1feb5-dc9f-4326-91fc-059ad84d8f97"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15798, 443, 160, 3, 67, "Subsection",ExpressionUUID->"6cf2147e-0d9c-4f3f-9646-62b7a8fc622c"],
+Cell[CellGroupData[{
+Cell[15983, 450, 322, 5, 56, "Subsubsection",ExpressionUUID->"0e065b42-a7a0-4e7e-8310-7e27933a87b9"],
+Cell[16308, 457, 2340, 53, 194, "Input",ExpressionUUID->"512aece4-a376-4467-8816-8f08cce43bbf"]
+}, Open  ]]
+}, Open  ]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[18709, 517, 306, 5, 65, "Section",ExpressionUUID->"b1857525-22d9-4a02-9b66-8039538cf0b1"],
+Cell[CellGroupData[{
+Cell[19040, 526, 157, 3, 67, "Subsection",ExpressionUUID->"330fd1d6-0d35-40c3-ab23-89924ef5016e"],
+Cell[19200, 531, 7690, 227, 792, "Input",ExpressionUUID->"68936e49-2839-4504-a3ef-347da6b44441"],
+Cell[26893, 760, 740, 20, 64, "Input",ExpressionUUID->"f63ffd2e-96ce-4438-af78-5065cada983e"],
+Cell[27636, 782, 13715, 374, 1092, "Input",ExpressionUUID->"e0b59db5-4004-49bb-a4df-9147bd0b9e73"],
+Cell[41354, 1158, 11191, 215, 610, "Input",ExpressionUUID->"812a90d4-6b0d-49b4-a774-73c86d11dc66"]
+}, Open  ]],
+Cell[52560, 1376, 77, 0, 67, "Subsection",ExpressionUUID->"033774a0-fd21-4a20-8eca-f016618a68c6"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[52674, 1381, 155, 3, 65, "Section",ExpressionUUID->"f51e8727-5109-4944-9500-95a90623a788"],
+Cell[52832, 1386, 14809, 369, 409, "Input",ExpressionUUID->"9580990e-b9f9-434d-89d0-7b1d6a68ab1b"],
+Cell[67644, 1757, 12214, 303, 398, "Input",ExpressionUUID->"e5d08509-c499-4c13-9a82-46fc256153bb"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
